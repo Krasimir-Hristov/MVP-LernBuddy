@@ -1,65 +1,137 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Rocket, Sparkles, Brain, GraduationCap } from 'lucide-react';
+import Link from 'next/link';
+
+const LandingPage = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background px-4'>
+      {/* Background Decorative Elements */}
+      <div className='absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none'>
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className='absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px]'
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+          className='absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px]'
+        />
+      </div>
+
+      <main className='max-w-4xl w-full text-center space-y-12'>
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className='space-y-6'
+        >
+          <div className='flex justify-center mb-6'>
+            <motion.div
+              whileHover={{ rotate: 15, scale: 1.1 }}
+              className='p-4 bg-primary/10 rounded-2xl border border-primary/20'
+            >
+              <GraduationCap className='w-12 h-12 text-primary' />
+            </motion.div>
+          </div>
+
+          <h1 className='text-5xl md:text-7xl font-bold tracking-tight'>
+            Dein{' '}
+            <span className='text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>
+              LernBuddy
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className='text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
+            Der Sokratische KI-Tutor, der dir nicht einfach die Antworten gibt,
+            sondern dir hilft, sie selbst zu entdecken.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </motion.div>
+
+        {/* Feature Cards */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className='grid grid-cols-1 md:grid-cols-3 gap-6'
+        >
+          {[
+            { icon: Brain, title: 'Sokratisch', desc: 'Lernen durch Fragen' },
+            {
+              icon: Sparkles,
+              title: 'Personalisiert',
+              desc: 'Auf dich zugeschnitten',
+            },
+            { icon: Rocket, title: 'Effektiv', desc: 'Nachhaltiges Wissen' },
+          ].map((feature, idx) => (
+            <motion.div key={idx} whileHover={{ y: -5 }} className='group'>
+              <Card className='p-6 bg-secondary/50 border-border/50 backdrop-blur-sm group-hover:border-primary/50 transition-colors'>
+                <feature.icon className='w-8 h-8 mb-4 text-primary group-hover:animate-pulse' />
+                <h3 className='text-lg font-semibold mb-2'>{feature.title}</h3>
+                <p className='text-sm text-muted-foreground'>{feature.desc}</p>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Call to Action */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className='pt-8'
+        >
+          <Link href='/onboarding'>
+            <Button
+              size='lg'
+              className='rounded-full px-12 py-8 text-xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all duration-300'
+            >
+              Starten
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                <Rocket className='ml-3 w-6 h-6' />
+              </motion.span>
+            </Button>
+          </Link>
+
+          <p className='mt-6 text-sm text-muted-foreground italic'>
+            "Sokratische Methode: Niemals die Lösung verraten, nur hinführen."
+          </p>
+        </motion.div>
       </main>
+
+      {/* Footer / Privacy Note */}
+      <footer className='absolute bottom-8 text-center w-full px-4'>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className='text-xs text-muted-foreground/60 uppercase tracking-widest'
+        >
+          Daten bleiben lokal im Browser • Keine Speicherung persönlicher Daten
+        </motion.p>
+      </footer>
     </div>
   );
-}
+};
+
+export default LandingPage;

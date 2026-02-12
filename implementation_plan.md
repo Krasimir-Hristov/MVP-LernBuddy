@@ -38,7 +38,7 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 3: Onboarding UI (Wow Factor)
 
-- [ ] **Step 3.1: Landing Page**
+- [x] **Step 3.1: Landing Page**
   - Create `app/page.tsx` with a "Start" button and premium animations.
 - [ ] **Step 3.2: Onboarding Flow Wrapper**
   - Create `components/features/onboarding/OnboardingFlow.tsx`.
