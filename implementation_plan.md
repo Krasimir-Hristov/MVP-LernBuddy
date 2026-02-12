@@ -27,10 +27,10 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
   - Create `context/UserContext.tsx`.
   - Define state for: `firstName`, `age`, `grade`, `subject`, `favoriteTeacher`, `hobby`.
   - Implement `UserProvider`.
-- [ ] **Step 2.2: Supabase Server Client**
+- [x] **Step 2.2: Supabase Server Client**
   - Create `lib/supabase/server.ts` (for Server Components).
   - Create `lib/supabase/admin.ts` (using Service Role Key for Proxy).
-- [ ] **Step 2.3: AI Service Proxy**
+- [x] **Step 2.3: AI Service Proxy**
   - Create `app/api/chat/route.ts` (The Proxy).
   - Implement POST handler.
   - Initialize GoogleGenerativeAI with server-side key.
