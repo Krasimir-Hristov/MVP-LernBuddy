@@ -71,28 +71,7 @@ const OnboardingPage = () => {
     if (currentStepIdx < STEPS.length - 1) {
       setCurrentStepIdx((prev) => prev + 1);
     } else {
-      console.clear();
-      console.log(
-        '%c--- LERNBUDDY AI CONFIGURATION ---',
-        'background: #2563eb; color: white; font-size: 16px; padding: 4px; border-radius: 4px;',
-      );
-
-      console.table({
-        Teacher: userData.favoriteTeacher,
-        Style: userData.teacherReason,
-        Student: userData.firstName,
-        Age: userData.age,
-        Grade: userData.grade,
-        Subject: userData.subject,
-        Hobby: userData.hobby,
-        Initial_Topic: userData.initialProblem,
-      });
-
-      console.log('Redirecting to chat in 2 seconds...');
-
-      setTimeout(() => {
-        router.push('/chat');
-      }, 2000);
+      router.push('/chat');
     }
   };
 

@@ -40,14 +40,14 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 - [x] **Step 3.1: Landing Page**
   - Create `app/page.tsx` with a "Start" button and premium animations.
-- [ ] **Step 3.2: Onboarding Flow Wrapper & Multi-step Logic**
+- [x] **Step 3.2: Onboarding Flow Wrapper & Multi-step Logic**
   - Create `app/onboarding/page.tsx`.
   - Implement Step Registry (Name -> Age -> Grade -> Subject -> Hobby -> Teacher -> Style -> Diagnostic).
   - Use Framer Motion `AnimatePresence` for smooth transitions.
-- [ ] **Step 3.3: Visual Persona Selection & Teacher Reason**
+- [x] **Step 3.3: Visual Persona Selection & Teacher Reason**
   - Create a rich UI for choosing the "Favorite Teacher".
   - Add the "Why me?" step where the teacher asks for the style (behavioral definition).
-- [ ] **Step 3.4: Diagnostic Question (Initial Problem)**
+- [x] **Step 3.4: Diagnostic Question (Initial Problem)**
   - Add the final onboarding step where the selected teacher asks: "What's bothering you in [Subject] today?".
 
 ## Phase 4: Chat Interface (Mobile First)
