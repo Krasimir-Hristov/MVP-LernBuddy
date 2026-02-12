@@ -23,7 +23,7 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 2: State & Core Logic
 
-- [ ] **Step 2.1: UserContext**
+- [x] **Step 2.1: UserContext**
   - Create `context/UserContext.tsx`.
   - Define state for: `firstName`, `age`, `grade`, `subject`, `favoriteTeacher`, `hobby`.
   - Implement `UserProvider`.
@@ -90,3 +90,14 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 - [ ] **Step 6.2: Security Verification**
   - Confirm NO secret keys are leaked to client logic.
   - Verify RLS policies on Supabase (if tables are accessed directly).
+
+## Phase 7: Admin Dashboard (Secure)
+
+- [ ] **Step 7.1: Admin Interface**
+  - Create a hidden `/admin` route.
+  - Implement a simple password-protected overlay/lock.
+- [ ] **Step 7.2: Analytics Visualization**
+  - Fetch anonymous usage stats from Supabase.
+  - Display "Total Users" and "Total Sessions".
+- [ ] **Step 7.3: Feedback Review**
+  - Display parent feedback logs in a clean dashboard view.
