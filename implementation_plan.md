@@ -4,21 +4,21 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 1: Setup & Foundation
 
-- [ ] **Step 1.1: Project Initialization**
+- [x] **Step 1.1: Project Initialization**
   - Initialize Next.js 16 app (`npx create-next-app@latest`).
   - Configure Tailwind CSS.
   - Initialize Git repository.
-- [ ] **Step 1.2: Dependency Installation**
+- [x] **Step 1.2: Dependency Installation**
   - Install core libraries: `framer-motion` (or `motion`), `@supabase/supabase-js`, `@supabase/ssr`, `@google/generative-ai`.
   - Install UI libraries: `lucide-react`, `clsx`, `tailwind-merge`.
   - Install Latex support: `react-latex-next` (or 'katex').
-- [ ] **Step 1.3: Shadcn UI Setup**
+- [x] **Step 1.3: Shadcn UI Setup**
   - Run `npx shadcn-ui@latest init`.
   - Install essential components: Button, Input, Card, Label, Textarea, ScrollArea, Avatar, Sheet (for mobile menu).
-- [ ] **Step 1.4: Environment Configuration**
+- [x] **Step 1.4: Environment Configuration**
   - Create `.env.local`.
-  - Define variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`.
-- [ ] **Step 1.5: Folder Structure**
+  - Define variables: `NEXT_PUBLIC_SB_URL`, `NEXT_PUBLIC_SB_PUBLISHABLE`, `SB_SECRET`, `GEMINI_API_KEY`.
+- [x] **Step 1.5: Folder Structure**
   - Set up `components/ui`, `components/features`, `lib/supabase`, `lib/ai`, `context`.
 
 ## Phase 2: State & Core Logic
