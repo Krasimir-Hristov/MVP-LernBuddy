@@ -23,31 +23,32 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 2: State & Core Logic
 
-- [x] **Step 2.1: UserContext**
+- [x] **Step 2.1: UserContext (Expanded)**
   - Create `context/UserContext.tsx`.
-  - Define state for: `firstName`, `age`, `grade`, `subject`, `favoriteTeacher`, `hobby`.
+  - Define state for: `firstName`, `age`, `grade`, `subject`, `favoriteTeacher`, `teacherReason`, `hobby`, `initialProblem`.
   - Implement `UserProvider`.
 - [x] **Step 2.2: Supabase Server Client**
   - Create `lib/supabase/server.ts` (for Server Components).
   - Create `lib/supabase/admin.ts` (using Service Role Key for Proxy).
-- [x] **Step 2.3: AI Service Proxy**
+- [x] **Step 2.3: AI Service Proxy (Refined)**
   - Create `app/api/chat/route.ts` (The Proxy).
   - Implement POST handler.
   - Initialize GoogleGenerativeAI with server-side key.
-  - Implement system instruction injection based on UserContext data (passed in request).
+  - Implement system instruction injection based on UserContext data (persona, teacher style, and response length constraints).
 
 ## Phase 3: Onboarding UI (Wow Factor)
 
 - [x] **Step 3.1: Landing Page**
   - Create `app/page.tsx` with a "Start" button and premium animations.
-- [ ] **Step 3.2: Onboarding Flow Wrapper**
-  - Create `components/features/onboarding/OnboardingFlow.tsx`.
-  - Implement step management (Step 1 -> Step 2 -> ...).
-- [ ] **Step 3.3: Form Steps (Animated)**
-  - Create components for each step: `NameStep`, `AgeStep`, `PersonaStep`, etc.
-  - Apply Framer Motion `AnimatePresence` for smooth transitions between steps.
-- [ ] **Step 3.4: Persona Selection**
-  - Create a visually rich selection for "Favorite Teacher" with avatars/icons.
+- [ ] **Step 3.2: Onboarding Flow Wrapper & Multi-step Logic**
+  - Create `app/onboarding/page.tsx`.
+  - Implement Step Registry (Name -> Age -> Grade -> Subject -> Hobby -> Teacher -> Style -> Diagnostic).
+  - Use Framer Motion `AnimatePresence` for smooth transitions.
+- [ ] **Step 3.3: Visual Persona Selection & Teacher Reason**
+  - Create a rich UI for choosing the "Favorite Teacher".
+  - Add the "Why me?" step where the teacher asks for the style (behavioral definition).
+- [ ] **Step 3.4: Diagnostic Question (Initial Problem)**
+  - Add the final onboarding step where the selected teacher asks: "What's bothering you in [Subject] today?".
 
 ## Phase 4: Chat Interface (Mobile First)
 

@@ -17,8 +17,10 @@ export interface UserOnboardingData {
   age: string;
   grade: string;
   subject: string;
-  favoriteTeacher: string; // The selected persona
+  favoriteTeacher: string; // The selected persona (e.g. "Einstein", "Leonardo")
+  teacherReason: string; // Why the child likes this teacher (defines behavior)
   hobby: string;
+  initialProblem: string; // The diagnostic question/topic
 }
 
 interface UserContextType {
@@ -34,7 +36,9 @@ const defaultData: UserOnboardingData = {
   grade: '',
   subject: '',
   favoriteTeacher: '',
+  teacherReason: '',
   hobby: '',
+  initialProblem: '',
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
