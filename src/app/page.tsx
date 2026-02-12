@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 const LandingPage = () => {
   return (
-    <div className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background px-4'>
+    <div className='relative min-h-screen flex flex-col items-center bg-background px-4 py-8 md:py-12'>
       {/* Background Decorative Elements */}
       <div className='absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none'>
         <motion.div
@@ -35,7 +35,7 @@ const LandingPage = () => {
         />
       </div>
 
-      <main className='max-w-4xl w-full text-center space-y-12'>
+      <main className='flex-1 flex flex-col items-center justify-center max-w-4xl w-full text-center space-y-12 my-8 md:my-12'>
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -96,9 +96,9 @@ const LandingPage = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className='pt-8'
+          className='pt-4 pb-8 md:pt-8'
         >
-          <Link href='/onboarding'>
+          <Link href='/onboarding' className='inline-block'>
             <Button
               size='lg'
               className='rounded-full px-12 py-8 text-xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all duration-300'
@@ -120,15 +120,21 @@ const LandingPage = () => {
       </main>
 
       {/* Footer / Privacy Note */}
-      <footer className='absolute bottom-8 text-center w-full px-4'>
-        <motion.p
+      <footer className='w-full text-center mt-auto pb-8 md:pb-12 pointer-events-none'>
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className='text-xs text-muted-foreground/60 uppercase tracking-widest'
+          className='flex flex-col items-center gap-2'
         >
-          Daten bleiben lokal im Browser • Keine Speicherung persönlicher Daten
-        </motion.p>
+          <p className='text-[10px] md:text-xs text-muted-foreground/80 uppercase tracking-widest font-medium'>
+            Daten bleiben lokal im Browser
+          </p>
+          <div className='h-px w-8 bg-primary/20' />
+          <p className='text-[10px] md:text-xs text-muted-foreground/60 uppercase tracking-widest'>
+            Keine Speicherung persönlicher Daten
+          </p>
+        </motion.div>
       </footer>
     </div>
   );
