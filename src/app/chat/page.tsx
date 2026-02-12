@@ -31,6 +31,15 @@ const ChatPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
   // Redirect if onboarding not complete
   useEffect(() => {
@@ -151,8 +160,8 @@ const ChatPage = () => {
       </header>
 
       {/* Message Area */}
-      <ScrollArea className='flex-1 p-4 pb-20'>
-        <div className='max-w-2xl mx-auto space-y-6 pb-8'>
+      <ScrollArea className='flex-1 p-4 pb-0 overflow-y-auto'>
+        <div className='max-w-2xl mx-auto space-y-6 pb-32'>
           <AnimatePresence initial={false}>
             {messages.map((m) => (
               <motion.div
@@ -211,6 +220,7 @@ const ChatPage = () => {
               </div>
             </motion.div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 

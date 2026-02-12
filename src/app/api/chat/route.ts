@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { model } from '@/lib/ai/gemini';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+// import { supabaseAdmin } from '@/lib/supabase/admin'; <--- Disable for now
 
 export async function POST(req: Request) {
   try {
@@ -35,60 +35,41 @@ export async function POST(req: Request) {
       ### SYSTEM_GUARD_END ###
     `.trim();
 
-    // Prepare history for Gemini startChat
-    // Gemini expects history in the format: { role: "user" | "model", parts: [{ text: string }] }
-    // We assume messages come in a standard { role, content } format from the client
-    const history = messages.slice(0, -1).map((m: any) => ({
+    // Prepare history for Gemini
+    // IMPORTANT: Gemini requires strictly alternating roles: user -> model -> user -> model
+    // We must ensure the history starts with 'user' and alternates.
+
+    const geminiHistory = messages.map((m: any) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }],
     }));
 
-    const lastMessage = messages[messages.length - 1].content;
-
-    // Start chat with system instruction
-    const chat = model.startChat({
-      history: history,
-      generationConfig: {
-        maxOutputTokens: 1000,
-      },
-      // Note: In newer SDKs, systemInstruction can be passed here or during model init
-      // Since we init model globally, we can use a "pre-prompt" or the specialized parameter if supported
-    });
-
-    // In this specific SDK version, we send the instruction as part of the first message
-    // or as a specialized systemInstruction if using the latest version.
-    // Let's use the most robust way: including context in the message or using the systemInstruction parameter.
-
-    const result = await model.generateContent({
-      contents: [
-        ...history,
-        {
-          role: 'user',
-          parts: [{ text: systemInstruction + '\n\n' + lastMessage }],
-        },
-      ],
-    });
-
-    const responseText = result.response.text();
-
-    // Log Anonymous Event to Supabase (Analytics)
-    if (userId) {
-      try {
-        await supabaseAdmin.from('events').insert({
-          user_id: userId,
-          event_type: 'chat_message',
-          metadata: {
-            subject: userData.subject,
-            teacher: userData.favoriteTeacher,
-          },
-        });
-      } catch (analyticsError) {
-        console.error('Analytics logging failed:', analyticsError);
-        // Don't fail the request if analytics fail
-      }
+    // Inject System Instruction into the very first message
+    // This is the most reliable way across different Gemini models/SDK versions
+    if (geminiHistory.length > 0) {
+      geminiHistory[0].parts[0].text =
+        systemInstruction + '\n\n' + geminiHistory[0].parts[0].text;
+    } else {
+      // Fallback if no history (should not happen in this flow)
+      geminiHistory.push({
+        role: 'user',
+        parts: [{ text: systemInstruction }],
+      });
     }
 
-    return NextResponse.json({ text: responseText });
+    try {
+      // Use generateContent directly with the full history + system prompt
+      // This avoids state management issues with startChat in serverless environments
+      const result = await model.generateContent({
+        contents: geminiHistory,
+      });
+
+      const responseText = result.response.text();
+      return NextResponse.json({ text: responseText });
+    } catch (aiError: any) {
+      console.error('Gemini API Error:', aiError);
+      throw aiError; // Re-throw to be caught by the outer catch block
+    }
   } catch (error) {
     console.error('Chat API Error:', error);
     return NextResponse.json(
