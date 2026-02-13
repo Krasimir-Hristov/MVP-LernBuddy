@@ -63,25 +63,28 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
   - Connect Chat UI to `app/api/chat/route.ts`.
   - Handle loading states (typing indicators).
   - Implement auto-scroll to bottom.
-- [ ] **Step 4.4: Vision/Image Upload**
-  - Add camera/upload button to input area.
-  - Convert image to base64/blob.
-  - Update Proxy to handle image parts in Gemini prompt.
+- [x] **Step 4.4: Vision/Image Upload**
+  - Add camera/upload button to input area (multi-upload support).
+  - Convert image to base64/blob + browser-side compression.
+  - Update Proxy to handle multiple image parts in Gemini prompt.
+  - Render sent images in Chat History for visual feedback.
 
 ## Phase 5: Analytics & Polish
 
-- [ ] **Step 5.1: Analytics Proxy**
-  - Create `app/api/analytics/route.ts`.
-  - Log anonymous events to Supabase `events` table.
-- [ ] **Step 5.2: Feedback System**
-  - Add simple "Parent Feedback" button/modal.
-  - Submit feedback via Analytics Proxy.
+- [ ] **Step 5.1: Unique User Tracking**
+  - Implement a `localStorage` based unique ID generation on the client.
+  - Create a Supabase Proxy (`app/api/analytics/route.ts`) with "Upsert" logic.
+  - Register the user in the `unique_users` table only once (per browser/identity).
+- [ ] **Step 5.2: Elegant Parent Feedback**
+  - Add a clearly visible, pulsing "Heart" icon ❤️ in the header.
+  - Implement a modal with a warm, personal message inviting parents to share ideas/feedback.
+  - Log feedback entries to Supabase via the Analytics Proxy.
 - [ ] **Step 5.3: SEO & Metadata**
-  - Update `app/layout.tsx` metadata.
-  - Add `manifest.json` for PWA capabilities (optional but recommended for mobile).
-- [ ] **Step 5.4: Mobile Optimization Check**
-  - Verify touch targets.
-  - Verify input focus handling (virtual keyboard).
+  - Configure Next.js Metadata API for beautiful social sharing (titles, descriptions).
+  - Add Favicon and App Icons.
+- [ ] **Step 5.4: Mobile Polish & Optimization**
+  - Verify touch targets and button sizes for children's UI.
+  - Handle virtual keyboard focus/scroll behavior in the chat.
 
 ## Phase 6: Final Review
 
