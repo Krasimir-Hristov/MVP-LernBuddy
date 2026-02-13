@@ -23,7 +23,7 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  image?: string; // Base64 image
+  images?: string[]; // Array of Base64 images
   timestamp: Date;
 }
 
@@ -32,7 +32,7 @@ const ChatPage = () => {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,7 +44,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading, image]);
+  }, [messages, isLoading, images]);
 
   // Redirect if onboarding not complete
   useEffect(() => {
@@ -67,8 +67,8 @@ const ChatPage = () => {
   }, [isComplete, userData, messages.length]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     try {
       const options = {
@@ -76,8 +76,17 @@ const ChatPage = () => {
         maxWidthOrHeight: 1024,
         useWebWorker: true,
       };
-      const compressedFile = await imageCompression(file, options);
-      setImage(compressedFile);
+
+      const compressedFiles = await Promise.all(
+        files.map((file) => imageCompression(file, options)),
+      );
+
+      setImages((prev) => [...prev, ...compressedFiles]);
+
+      // Reset input value to allow re-uploading the same file if removed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error('Image compression failed:', error);
     }
@@ -93,25 +102,27 @@ const ChatPage = () => {
   };
 
   const handleSend = async () => {
-    if ((!input.trim() && !image) || isLoading) return;
+    if ((!input.trim() && images.length === 0) || isLoading) return;
 
-    let base64Image = undefined;
-    if (image) {
-      base64Image = await convertToBase64(image);
+    let base64Images = undefined;
+    if (images.length > 0) {
+      base64Images = await Promise.all(
+        images.map((img) => convertToBase64(img)),
+      );
     }
 
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input,
-      image: base64Image,
+      images: base64Images,
       timestamp: new Date(),
     };
 
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
-    setImage(null);
+    setImages([]);
     setIsLoading(true);
 
     try {
@@ -122,7 +133,7 @@ const ChatPage = () => {
           messages: newMessages.map((m) => ({
             role: m.role,
             content: m.content,
-            image: m.image, // Pass image to backend
+            images: m.images, // Pass array of images to backend
           })),
           userData: userData,
           userId: 'anonymous-user',
@@ -224,6 +235,20 @@ const ChatPage = () => {
                     }
                   `}
                 >
+                  {/* Render Images if present */}
+                  {m.images && m.images.length > 0 && (
+                    <div className='flex flex-wrap gap-2 mb-2'>
+                      {m.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt='Sent content'
+                          className='max-w-[150px] max-h-[150px] rounded-lg border border-white/20 shadow-sm hover:scale-105 transition-transform'
+                        />
+                      ))}
+                    </div>
+                  )}
+
                   <p className='text-sm md:text-base leading-relaxed whitespace-pre-wrap'>
                     {m.content}
                   </p>
@@ -271,21 +296,27 @@ const ChatPage = () => {
       {/* Input Area */}
       <div className='absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background via-background to-transparent z-10'>
         <div className='max-w-2xl mx-auto relative group'>
-          {/* Image Preview */}
-          {image && (
-            <div className='absolute -top-24 left-4 z-20'>
-              <div className='relative'>
-                <img
-                  src={URL.createObjectURL(image)}
-                  alt='Preview'
-                  className='w-20 h-20 object-cover rounded-xl border-2 border-primary/20 shadow-lg'
-                />
-                <button
-                  onClick={() => setImage(null)}
-                  className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform cursor-pointer'
-                >
-                  <X className='w-3 h-3' />
-                </button>
+          {/* Images Preview */}
+          {images.length > 0 && (
+            <div className='absolute -top-28 left-0 w-full px-4 overflow-x-auto pb-4'>
+              <div className='flex gap-3'>
+                {images.map((img, index) => (
+                  <div key={index} className='relative flex-shrink-0'>
+                    <img
+                      src={URL.createObjectURL(img)}
+                      alt={`Preview ${index}`}
+                      className='w-20 h-20 object-cover rounded-xl border-2 border-primary/20 shadow-lg'
+                    />
+                    <button
+                      onClick={() =>
+                        setImages((prev) => prev.filter((_, i) => i !== index))
+                      }
+                      className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform cursor-pointer'
+                    >
+                      <X className='w-3 h-3' />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -295,6 +326,7 @@ const ChatPage = () => {
             <input
               type='file'
               accept='image/*'
+              multiple
               className='hidden'
               ref={fileInputRef}
               onChange={handleImageUpload}
@@ -320,7 +352,7 @@ const ChatPage = () => {
             <Button
               size='icon'
               onClick={handleSend}
-              disabled={(!input.trim() && !image) || isLoading}
+              disabled={(!input.trim() && images.length === 0) || isLoading}
               className='rounded-full h-11 w-11 shadow-md cursor-pointer'
             >
               <Send className='w-5 h-5' />

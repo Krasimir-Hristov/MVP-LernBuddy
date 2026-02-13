@@ -46,16 +46,43 @@ export async function POST(req: Request) {
     // IMPORTANT: Gemini requires strictly alternating roles: user -> model -> user -> model
     // We must ensure the history starts with 'user' and alternates.
 
-    const geminiHistory = messages.map((m: any) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    }));
+    const geminiHistory = messages.map((m: any) => {
+      const parts: any[] = [{ text: m.content || '' }]; // Ensure text is never undefined
+
+      // Check for array of Base64 images and add to parts if present
+      if (Array.isArray(m.images)) {
+        m.images.forEach((img: string) => {
+          if (typeof img === 'string' && img.includes(',')) {
+            try {
+              const [meta, data] = img.split(',');
+              const mimeType = meta.split(';')[0].split(':')[1];
+
+              if (data && mimeType) {
+                parts.push({
+                  inlineData: {
+                    data: data,
+                    mimeType: mimeType,
+                  },
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing base64 image:', e);
+            }
+          }
+        });
+      }
+
+      return {
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: parts,
+      };
+    });
 
     // Inject System Instruction into the very first message
     // This is the most reliable way across different Gemini models/SDK versions
     if (geminiHistory.length > 0) {
       geminiHistory[0].parts[0].text =
-        systemInstruction + '\n\n' + geminiHistory[0].parts[0].text;
+        systemInstruction + '\n\n' + (geminiHistory[0].parts[0].text || '');
     } else {
       // Fallback if no history (should not happen in this flow)
       geminiHistory.push({
