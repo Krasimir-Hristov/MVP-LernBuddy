@@ -48,13 +48,13 @@ const ChatPage = () => {
     }
   }, [isComplete, router]);
 
-  // Initial greeting from teacher
+  // Initial greeting from teacherg
   useEffect(() => {
     if (isComplete && messages.length === 0) {
       const greeting: Message = {
         id: 'initial',
         role: 'assistant',
-        content: `Hallo ${userData.firstName}! Ich bin ${userData.favoriteTeacher}. 👋\n\nDu hast gesagt, dass dich "${userData.initialProblem}" in ${userData.subject} gerade beschäftigt. Lass uns doch direkt mal reinschauen – was genau ist dabei die größte Hürde за теб?`,
+        content: `Hallo ${userData.firstName}! Ich bin ${userData.favoriteTeacher}. 👋\n\nDu hast gesagt, dass dich "${userData.initialProblem}" in ${userData.subject} gerade beschäftigt. Lass uns doch direkt mal reinschauen – was genau ist dabei die größte Hürde für dich?`,
         timestamp: new Date(),
       };
       setMessages([greeting]);
@@ -168,8 +168,13 @@ const ChatPage = () => {
                 key={m.id}
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
+                <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 px-1'>
+                  {m.role === 'user'
+                    ? userData.firstName
+                    : userData.favoriteTeacher}
+                </span>
                 <div
                   className={`
                     max-w-[85%] rounded-2xl p-4 shadow-sm relative group

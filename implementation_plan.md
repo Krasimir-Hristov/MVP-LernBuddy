@@ -52,14 +52,14 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 4: Chat Interface (Mobile First)
 
-- [ ] **Step 4.1: Chat Layout**
+- [x] **Step 4.1: Chat Layout**
   - Create `app/chat/page.tsx`.
   - Implement a mobile-first layout (fixed bottom input, scrollable message area).
-- [ ] **Step 4.2: Message Components**
-  - Create `MessageBubble.tsx`.
-  - Style User vs AI messages distinctively.
+- [x] **Step 4.2: Message Components**
+  - Create `MessageBubble.tsx` (Inline in ChatPage for now).
+  - Style User vs AI messages distinctively with Sender Names.
   - Integrate LaTeX rendering for math.
-- [ ] **Step 4.3: Chat Logic Integration**
+- [x] **Step 4.3: Chat Logic Integration**
   - Connect Chat UI to `app/api/chat/route.ts`.
   - Handle loading states (typing indicators).
   - Implement auto-scroll to bottom.
