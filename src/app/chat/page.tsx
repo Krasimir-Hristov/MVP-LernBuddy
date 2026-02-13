@@ -14,13 +14,16 @@ import {
   User,
   Camera,
   RotateCcw,
+  X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import imageCompression from 'browser-image-compression';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  image?: string; // Base64 image
   timestamp: Date;
 }
 
@@ -29,9 +32,11 @@ const ChatPage = () => {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -39,7 +44,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages, isLoading, image]);
 
   // Redirect if onboarding not complete
   useEffect(() => {
@@ -61,19 +66,52 @@ const ChatPage = () => {
     }
   }, [isComplete, userData, messages.length]);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+      setImage(compressedFile);
+    } catch (error) {
+      console.error('Image compression failed:', error);
+    }
+  };
+
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !image) || isLoading) return;
+
+    let base64Image = undefined;
+    if (image) {
+      base64Image = await convertToBase64(image);
+    }
 
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input,
+      image: base64Image,
       timestamp: new Date(),
     };
 
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
+    setImage(null);
     setIsLoading(true);
 
     try {
@@ -84,6 +122,7 @@ const ChatPage = () => {
           messages: newMessages.map((m) => ({
             role: m.role,
             content: m.content,
+            image: m.image, // Pass image to backend
           })),
           userData: userData,
           userId: 'anonymous-user',
@@ -232,12 +271,41 @@ const ChatPage = () => {
       {/* Input Area */}
       <div className='absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background via-background to-transparent z-10'>
         <div className='max-w-2xl mx-auto relative group'>
+          {/* Image Preview */}
+          {image && (
+            <div className='absolute -top-24 left-4 z-20'>
+              <div className='relative'>
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt='Preview'
+                  className='w-20 h-20 object-cover rounded-xl border-2 border-primary/20 shadow-lg'
+                />
+                <button
+                  onClick={() => setImage(null)}
+                  className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform cursor-pointer'
+                >
+                  <X className='w-3 h-3' />
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className='absolute inset-0 bg-primary/10 rounded-3xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity' />
           <div className='relative flex items-center gap-2 bg-secondary/80 border border-border/50 backdrop-blur-xl rounded-3xl p-1.5 shadow-lg'>
+            <input
+              type='file'
+              accept='image/*'
+              className='hidden'
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              disabled={isLoading}
+            />
             <Button
               variant='ghost'
               size='icon'
-              className='rounded-full hidden sm:flex cursor-pointer'
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading}
+              className='rounded-full flex cursor-pointer hover:bg-primary/10'
             >
               <Camera className='w-5 h-5 text-muted-foreground' />
             </Button>
@@ -246,12 +314,13 @@ const ChatPage = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={`Schreib ${userData.favoriteTeacher} etwas...`}
+              disabled={isLoading}
               className='flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base h-12 px-2'
             />
             <Button
               size='icon'
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && !image) || isLoading}
               className='rounded-full h-11 w-11 shadow-md cursor-pointer'
             >
               <Send className='w-5 h-5' />
