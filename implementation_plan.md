@@ -71,7 +71,7 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
 
 ## Phase 5: Analytics & Polish
 
-- [ ] **Step 5.1: Unique User Tracking**
+- [x] **Step 5.1: Unique User Tracking**
   - Implement a `localStorage` based unique ID generation on the client.
   - Create a Supabase Proxy (`app/api/analytics/route.ts`) with "Upsert" logic.
   - Register the user in the `unique_users` table only once (per browser/identity).
