@@ -35,6 +35,7 @@ const ChatPage = () => {
   const [input, setInput] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,28 +105,29 @@ const ChatPage = () => {
   const handleSend = async () => {
     if ((!input.trim() && images.length === 0) || isLoading) return;
 
-    let base64Images = undefined;
-    if (images.length > 0) {
-      base64Images = await Promise.all(
-        images.map((img) => convertToBase64(img)),
-      );
-    }
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      images: base64Images,
-      timestamp: new Date(),
-    };
-
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    setInput('');
-    setImages([]);
     setIsLoading(true);
 
     try {
+      let base64Images = undefined;
+      if (images.length > 0) {
+        base64Images = await Promise.all(
+          images.map((img) => convertToBase64(img)),
+        );
+      }
+
+      const userMsg: Message = {
+        id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        role: 'user',
+        content: input,
+        images: base64Images,
+        timestamp: new Date(),
+      };
+
+      const newMessages = [...messages, userMsg];
+      setMessages(newMessages);
+      setInput('');
+      setImages([]);
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,19 +135,33 @@ const ChatPage = () => {
           messages: newMessages.map((m) => ({
             role: m.role,
             content: m.content,
-            images: m.images, // Pass array of images to backend
+            images: m.images,
           })),
           userData: userData,
           userId: 'anonymous-user',
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        // Check for Quota Exceeded (429) or special budget messages
+        if (
+          response.status === 429 ||
+          errorData.details?.toLowerCase().includes('quota') ||
+          errorData.error?.toLowerCase().includes('quota')
+        ) {
+          setShowQuotaModal(true);
+          return; // Exit silently as we are showing the custom modal
+        }
+
+        throw new Error(errorData.error || 'API_ERROR');
+      }
 
       const data = await response.json();
 
       const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         role: 'assistant',
         content: data.text,
         timestamp: new Date(),
@@ -155,7 +171,7 @@ const ChatPage = () => {
     } catch (error) {
       console.error('Chat Error:', error);
       const errorMsg: Message = {
-        id: Date.now().toString(),
+        id: `error-${Date.now()}`,
         role: 'assistant',
         content:
           'Entschuldige, ich habe gerade ein kleines technisches Problem. Kannst du es noch einmal versuchen? ✨',
@@ -245,7 +261,7 @@ const ChatPage = () => {
           <AnimatePresence initial={false} mode='popLayout'>
             {messages.map((m) => (
               <motion.div
-                key={m.id}
+                key={m.id || `msg-${Math.random()}`}
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 layout
@@ -295,7 +311,7 @@ const ChatPage = () => {
                     <div className='flex flex-wrap gap-2 mb-3'>
                       {m.images.map((img, idx) => (
                         <motion.img
-                          key={idx}
+                          key={`img-${m.id}-${idx}`}
                           src={img}
                           alt='Sent content'
                           initial={{ opacity: 0, scale: 0.8 }}
@@ -315,8 +331,10 @@ const ChatPage = () => {
 
             {isLoading && (
               <motion.div
+                key='loading-indicator'
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
                 className='flex items-start gap-3'
               >
                 <div className='w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-blue-500 flex items-center justify-center shadow-lg shadow-primary/20'>
@@ -325,7 +343,7 @@ const ChatPage = () => {
                 <div className='bg-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl rounded-tl-none p-4 flex items-center gap-1.5'>
                   {[0, 0.2, 0.4].map((delay) => (
                     <motion.div
-                      key={delay}
+                      key={`dot-${delay}`}
                       animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                       transition={{ repeat: Infinity, duration: 1, delay }}
                       className='w-2 h-2 bg-primary rounded-full'
@@ -432,6 +450,62 @@ const ChatPage = () => {
           </p>
         </div>
       </div>
+      {/* 5. Quota Exceeded Modal (Friendly for parents) */}
+      <AnimatePresence>
+        {showQuotaModal && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm'>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className='max-w-md w-full bg-secondary/80 border border-white/20 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl relative overflow-hidden text-center'
+            >
+              {/* Background Glow */}
+              <div className='absolute -top-24 -left-24 w-48 h-48 bg-primary/20 rounded-full blur-[80px]' />
+              <div className='absolute -bottom-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-[80px]' />
+
+              <div className='relative space-y-6'>
+                <div className='w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-primary/20'>
+                  <RotateCcw className='w-10 h-10 text-primary animate-spin-slow' />
+                </div>
+
+                <h2 className='text-3xl font-bold tracking-tight'>
+                  Pause für unseren <br />
+                  <span className='bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>
+                    KI-Copiloten
+                  </span>
+                </h2>
+
+                <div className='space-y-4 text-muted-foreground leading-relaxed'>
+                  <p>
+                    LernBuddy ist aktuell ein{' '}
+                    <strong>Copilot-Testprojekt</strong> mit einem kleinen
+                    Start-Budget.
+                  </p>
+                  <p className='text-sm'>
+                    Wir haben für heute das Limit an kostenlosen Fragen
+                    erreicht. Aber keine Sorge! Morgen sind wir wieder mit
+                    voller Energie für dich da. 🚀
+                  </p>
+                </div>
+
+                <div className='pt-4'>
+                  <Button
+                    onClick={() => setShowQuotaModal(false)}
+                    className='w-full rounded-2xl h-14 text-lg font-bold shadow-lg shadow-primary/20'
+                  >
+                    Verstanden
+                  </Button>
+                </div>
+
+                <p className='text-[10px] uppercase tracking-[0.2em] font-bold opacity-40'>
+                  Danke für deine Geduld!
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
