@@ -148,11 +148,11 @@ const OnboardingPage = () => {
         return (
           <TextStep
             title={`Warum magst du ${userData.favoriteTeacher}?`}
-            description='Erzähl mir ein bisschen – erklärt er/sie z.B. besonders ruhig, lustig или macht er/sie tolle Experimente?'
+            description='Erzähl mir ein bisschen – erklärt er/sie z.B. besonders ruhig, lustig oder macht er/sie tolle Experimente?'
             value={userData.teacherReason}
             type='textarea'
             onChange={(val) => updateUserData({ teacherReason: val })}
-            placeholder='z.B. Weil er alles ganz verständlich erklärt и immer geduldig ist...'
+            placeholder='z.B. Weil er alles ganz verständlich erklärt und immer geduldig ist...'
           />
         );
       case 'diagnostic':

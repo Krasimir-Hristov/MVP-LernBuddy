@@ -28,6 +28,7 @@ interface UserContextType {
   updateUserData: (data: Partial<UserOnboardingData>) => void;
   isComplete: boolean;
   clearUserData: () => void;
+  userId: string | null;
 }
 
 const defaultData: UserOnboardingData = {
@@ -41,22 +42,69 @@ const defaultData: UserOnboardingData = {
   initialProblem: '',
 };
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<UserOnboardingData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Load from local storage on mount (Privacy: Data remains in browser)
   useEffect(() => {
-    const saved = localStorage.getItem('lernbuddy_user_data');
-    if (saved) {
+    // 1. Load User Data
+    const savedData = localStorage.getItem('lernbuddy_user_data');
+    if (savedData) {
       try {
-        setUserData(JSON.parse(saved));
+        setUserData(JSON.parse(savedData));
       } catch (e) {
         console.error('Failed to parse user data from localStorage', e);
       }
     }
+
+    // 2. Load or Generate User ID for Analytics
+    let existingId = localStorage.getItem('lernbuddy_user_id');
+    if (!existingId) {
+      existingId = generateUUID();
+      localStorage.setItem('lernbuddy_user_id', existingId);
+    }
+    setUserId(existingId);
+
+    // 3. Register User (Fire & Forget via Proxy)
+    const register = async () => {
+      try {
+        const response = await fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'register_user',
+            data: {
+              user_id: existingId,
+              user_agent: navigator.userAgent,
+              locale: navigator.language,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          console.error('Analytics Proxy Error:', errData);
+        } else {
+          console.log('User registered successfully via proxy');
+        }
+      } catch (err) {
+        console.error('Failed to call analytics proxy:', err);
+      }
+    };
+
+    register();
     setIsLoading(false);
   }, []);
 
@@ -71,6 +119,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const clearUserData = () => {
     setUserData(defaultData);
     localStorage.removeItem('lernbuddy_user_data');
+    // Note: We intentionally do NOT clear user_id to keep tracking unique installs
   };
 
   // Check if all required onboarding fields are filled
@@ -78,7 +127,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userData, updateUserData, isComplete, clearUserData }}
+      value={{ userData, updateUserData, isComplete, clearUserData, userId }}
     >
       {!isLoading && children}
     </UserContext.Provider>
