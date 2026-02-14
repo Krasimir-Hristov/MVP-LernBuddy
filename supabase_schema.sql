@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS public.feedback (
     user_id UUID REFERENCES public.unique_users(id) ON DELETE SET NULL,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     message TEXT,
+    email TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

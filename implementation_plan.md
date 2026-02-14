@@ -75,7 +75,7 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
   - Implement a `localStorage` based unique ID generation on the client.
   - Create a Supabase Proxy (`app/api/analytics/route.ts`) with "Upsert" logic.
   - Register the user in the `unique_users` table only once (per browser/identity).
-- [ ] **Step 5.2: Elegant Parent Feedback**
+- [x] **Step 5.2: Elegant Parent Feedback**
   - Add a clearly visible, pulsing "Heart" icon ❤️ in the header.
   - Implement a modal with a warm, personal message inviting parents to share ideas/feedback.
   - Log feedback entries to Supabase via the Analytics Proxy.

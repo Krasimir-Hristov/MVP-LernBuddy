@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import imageCompression from 'browser-image-compression';
+import { FeedbackModal } from '@/components/features/feedback/FeedbackModal';
 
 interface Message {
   id: string;
@@ -100,7 +101,6 @@ const ChatPage = () => {
       reader.onerror = (error) => reject(error);
     });
   };
-
   const handleSend = async () => {
     if ((!input.trim() && images.length === 0) || isLoading) return;
 
@@ -168,196 +168,274 @@ const ChatPage = () => {
   };
 
   return (
-    <div className='flex flex-col h-screen bg-background overflow-hidden relative'>
-      {/* Dynamic Background Blurs */}
-      <div className='absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none'>
-        <div className='absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px]' />
-        <div className='absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[100px]' />
+    <div className='flex flex-col h-screen bg-background relative overflow-hidden font-sans text-foreground'>
+      {/* 1. Animated Background Blobs (Premium Style) */}
+      <div className='absolute inset-0 w-full h-full overflow-hidden -z-10 pointer-events-none'>
+        <div className='absolute inset-0 bg-background/80 backdrop-blur-[1px]' />{' '}
+        {/* Subtle overlay */}
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className='absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-primary/20 rounded-full blur-[120px]'
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+          className='absolute top-[40%] -right-[10%] w-[50%] h-[60%] bg-blue-500/10 rounded-full blur-[130px]'
+        />
       </div>
 
-      {/* Header */}
-      <header className='flex items-center justify-between px-4 h-16 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-20'>
-        <div className='flex items-center gap-3'>
+      {/* 2. Glassmorphism Header with Feedback Integrated */}
+      <header className='flex items-center justify-between px-6 py-4 z-30 sticky top-0 bg-background/40 backdrop-blur-xl border-b border-white/10 shadow-sm'>
+        <div className='flex items-center gap-4'>
           <Button
             variant='ghost'
             size='icon'
             onClick={() => router.push('/')}
-            className='rounded-full cursor-pointer'
+            className='rounded-full w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-muted-foreground'
           >
             <ArrowLeft className='w-5 h-5' />
           </Button>
-          <div className='flex items-center gap-2'>
-            <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20'>
-              <Sparkles className='w-5 h-5 text-primary' />
-            </div>
-            <div>
-              <h1 className='text-sm font-bold tracking-tight'>
-                {userData.favoriteTeacher}
-              </h1>
-              <p className='text-[10px] text-muted-foreground uppercase tracking-widest leading-none mt-0.5'>
-                KI-Tutor • {userData.subject}
+
+          <div className='flex flex-col'>
+            <h1 className='text-xl md:text-2xl font-bold tracking-tight'>
+              <span className='text-foreground'>Lern</span>
+              <span className='bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>
+                Buddy
+              </span>
+            </h1>
+            <div className='flex items-center gap-2'>
+              <span className='relative flex h-2 w-2'>
+                <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75'></span>
+                <span className='relative inline-flex rounded-full h-2 w-2 bg-green-500'></span>
+              </span>
+              <p className='text-xs font-medium text-muted-foreground uppercase tracking-widest'>
+                {userData.subject}
               </p>
             </div>
           </div>
         </div>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='rounded-full cursor-pointer'
-        >
-          <RotateCcw className='w-5 h-5 text-muted-foreground' />
-        </Button>
+
+        {/* Feedback Button - Integrated & Visible */}
+        <div className='flex items-center gap-3'>
+          <div className='hidden md:flex flex-col items-end mr-2'>
+            <span className='text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse'>
+              Deine Meinung?
+            </span>
+          </div>
+          <FeedbackModal />
+        </div>
       </header>
 
-      {/* Message Area */}
-      <ScrollArea className='flex-1 p-4 pb-0 overflow-y-auto'>
-        <div className='max-w-2xl mx-auto space-y-6 pb-32'>
-          <AnimatePresence initial={false}>
+      {/* 3. Messages Area */}
+      <ScrollArea className='flex-1 p-4 pb-0 overflow-y-auto z-10'>
+        <div className='max-w-3xl mx-auto space-y-8 pb-40 pt-6'>
+          <AnimatePresence initial={false} mode='popLayout'>
             {messages.map((m) => (
               <motion.div
                 key={m.id}
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
+                layout
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
-                <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 px-1'>
-                  {m.role === 'user'
-                    ? userData.firstName
-                    : userData.favoriteTeacher}
-                </span>
-                <div
-                  className={`
-                    max-w-[85%] rounded-2xl p-4 shadow-sm relative group
-                    ${
-                      m.role === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-tr-none'
-                        : 'bg-secondary/80 border border-border/50 backdrop-blur-sm rounded-tl-none'
-                    }
-                  `}
-                >
-                  {/* Render Images if present */}
-                  {m.images && m.images.length > 0 && (
-                    <div className='flex flex-wrap gap-2 mb-2'>
-                      {m.images.map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={img}
-                          alt='Sent content'
-                          className='max-w-[150px] max-h-[150px] rounded-lg border border-white/20 shadow-sm hover:scale-105 transition-transform'
-                        />
-                      ))}
+                <div className='flex items-center gap-2 mb-2 px-1 opacity-80'>
+                  {m.role === 'assistant' ? (
+                    <div className='w-6 h-6 rounded-full bg-gradient-to-tr from-primary to-blue-500 flex items-center justify-center text-[10px] text-white font-bold shadow-lg shadow-primary/20'>
+                      AI
+                    </div>
+                  ) : (
+                    <div className='w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] text-slate-600 font-bold'>
+                      You
                     </div>
                   )}
-
-                  <p className='text-sm md:text-base leading-relaxed whitespace-pre-wrap'>
-                    {m.content}
-                  </p>
-                  <span className='absolute bottom-1 right-2 text-[8px] opacity-40 uppercase'>
+                  <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>
+                    {m.role === 'user'
+                      ? userData.firstName
+                      : userData.favoriteTeacher}
+                  </span>
+                  <span className='text-[10px] text-muted-foreground/60'>
+                    •
+                  </span>
+                  <span className='text-[10px] text-muted-foreground/60'>
                     {m.timestamp.toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </span>
                 </div>
+
+                <div
+                  className={`
+                    relative max-w-[90%] md:max-w-[80%] rounded-2xl p-5 shadow-sm overflow-hidden
+                    ${
+                      m.role === 'user'
+                        ? 'bg-gradient-to-br from-primary to-blue-600 text-white rounded-tr-none shadow-primary/25'
+                        : 'bg-secondary/40 backdrop-blur-md border border-white/10 text-foreground rounded-tl-none'
+                    }
+                  `}
+                >
+                  {/* Subtle noise texture/gradient overlay for distinct look */}
+                  {m.role === 'user' && (
+                    <div className='absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity pointer-events-none' />
+                  )}
+
+                  {/* Render Images if present */}
+                  {m.images && m.images.length > 0 && (
+                    <div className='flex flex-wrap gap-2 mb-3'>
+                      {m.images.map((img, idx) => (
+                        <motion.img
+                          key={idx}
+                          src={img}
+                          alt='Sent content'
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className='max-w-[150px] max-h-[150px] rounded-xl border-2 border-white/20 shadow-md hover:scale-105 transition-transform object-cover'
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className='prose prose-sm dark:prose-invert max-w-none leading-relaxed whitespace-pre-wrap selection:bg-white/30 text-base'>
+                    {m.content}
+                  </div>
+                </div>
               </motion.div>
             ))}
-          </AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className='flex justify-start'
-            >
-              <div className='bg-secondary/40 rounded-2xl p-4 border border-border/50 rounded-tl-none'>
-                <div className='flex gap-1.5'>
+
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='flex items-start gap-3'
+              >
+                <div className='w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-blue-500 flex items-center justify-center shadow-lg shadow-primary/20'>
+                  <Sparkles className='w-4 h-4 text-white animate-pulse' />
+                </div>
+                <div className='bg-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl rounded-tl-none p-4 flex items-center gap-1.5'>
                   <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ repeat: Infinity, duration: 1 }}
-                    className='w-1.5 h-1.5 bg-primary rounded-full'
+                    className='w-2 h-2 bg-primary rounded-full'
                   />
                   <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                    className='w-1.5 h-1.5 bg-primary rounded-full'
+                    className='w-2 h-2 bg-primary rounded-full'
                   />
                   <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                    className='w-1.5 h-1.5 bg-primary rounded-full'
+                    className='w-2 h-2 bg-primary rounded-full'
                   />
                 </div>
-              </div>
-            </motion.div>
-          )}
-          <div ref={messagesEndRef} />
+              </motion.div>
+            )}
+            <div ref={messagesEndRef} />
+          </AnimatePresence>
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <div className='absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background via-background to-transparent z-10'>
-        <div className='max-w-2xl mx-auto relative group'>
-          {/* Images Preview */}
-          {images.length > 0 && (
-            <div className='absolute -top-28 left-0 w-full px-4 overflow-x-auto pb-4'>
-              <div className='flex gap-3'>
+      {/* 4. Input Area (Floating Premium Style) */}
+      <div className='absolute bottom-0 left-0 w-full p-4 md:p-6 pb-6 bg-gradient-to-t from-background via-background/90 to-transparent z-20 pointer-events-none'>
+        <div className='max-w-3xl mx-auto relative group pointer-events-auto'>
+          {/* Images Preview - Floating above input */}
+          <AnimatePresence>
+            {images.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className='absolute -top-32 left-0 w-full px-1 overflow-x-auto pb-4 flex gap-3'
+              >
                 {images.map((img, index) => (
-                  <div key={index} className='relative flex-shrink-0'>
+                  <div key={index} className='relative flex-shrink-0 group/img'>
                     <img
                       src={URL.createObjectURL(img)}
                       alt={`Preview ${index}`}
-                      className='w-20 h-20 object-cover rounded-xl border-2 border-primary/20 shadow-lg'
+                      className='w-24 h-24 object-cover rounded-2xl border-2 border-primary/30 shadow-xl bg-background/50 backdrop-blur-sm'
                     />
                     <button
                       onClick={() =>
                         setImages((prev) => prev.filter((_, i) => i !== index))
                       }
-                      className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform cursor-pointer'
+                      className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1.5 shadow-lg scale-0 group-hover/img:scale-100 hover:bg-red-600 transition-all cursor-pointer'
                     >
-                      <X className='w-3 h-3' />
+                      <X className='w-4 h-4' />
                     </button>
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className='absolute inset-0 bg-primary/10 rounded-3xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity' />
-          <div className='relative flex items-center gap-2 bg-secondary/80 border border-border/50 backdrop-blur-xl rounded-3xl p-1.5 shadow-lg'>
-            <input
-              type='file'
-              accept='image/*'
-              multiple
-              className='hidden'
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-              disabled={isLoading}
-            />
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
-              className='rounded-full flex cursor-pointer hover:bg-primary/10'
-            >
-              <Camera className='w-5 h-5 text-muted-foreground' />
-            </Button>
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={`Schreib ${userData.favoriteTeacher} etwas...`}
-              disabled={isLoading}
-              className='flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base h-12 px-2'
-            />
-            <Button
-              size='icon'
-              onClick={handleSend}
-              disabled={(!input.trim() && images.length === 0) || isLoading}
-              className='rounded-full h-11 w-11 shadow-md cursor-pointer'
-            >
-              <Send className='w-5 h-5' />
-            </Button>
+          {/* Glass Input Bar */}
+          <div className='relative'>
+            {/* Glow Effect on Focus */}
+            <div className='absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-[32px] blur opacity-20 group-focus-within:opacity-75 transition duration-500' />
+
+            <div className='relative flex items-center gap-2 bg-background/60 border border-white/10 backdrop-blur-2xl rounded-[30px] p-2 shadow-2xl'>
+              {/* Camera Button */}
+              <input
+                type='file'
+                accept='image/*'
+                multiple
+                className='hidden'
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                disabled={isLoading}
+              />
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+                className='rounded-full w-12 h-12 hover:bg-secondary/80 text-muted-foreground hover:text-primary transition-colors'
+              >
+                <Camera className='w-6 h-6' />
+              </Button>
+
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                placeholder={`Schreib ${userData.favoriteTeacher} etwas...`}
+                disabled={isLoading}
+                className='flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-lg h-12 px-2 placeholder:text-muted-foreground/50'
+              />
+
+              <Button
+                size='icon'
+                onClick={handleSend}
+                disabled={(!input.trim() && images.length === 0) || isLoading}
+                className={`
+                  rounded-full w-12 h-12 shadow-lg transition-all duration-300
+                  ${
+                    !input.trim() && images.length === 0
+                      ? 'bg-secondary text-muted-foreground opacity-50 cursor-not-allowed'
+                      : 'bg-primary text-primary-foreground hover:scale-105 hover:shadow-primary/30'
+                  }
+                `}
+              >
+                <Send className='w-5 h-5 ml-0.5' />
+              </Button>
+            </div>
           </div>
+
+          <p className='text-[10px] text-center mt-3 text-muted-foreground/40 font-medium tracking-widest uppercase'>
+            KI kann Fehler machen. Überprüfe wichtige Infos.
+          </p>
         </div>
       </div>
     </div>

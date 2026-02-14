@@ -46,12 +46,13 @@ export async function POST(req: Request) {
     }
 
     if (type === 'feedback') {
-      const { user_id, message, rating } = data;
+      const { user_id, message, rating, email } = data;
 
       const { error } = await supabaseAdmin.from('feedback').insert({
         user_id: user_id,
         message: message,
         rating: rating,
+        email: email,
         created_at: new Date().toISOString(),
       });
 
