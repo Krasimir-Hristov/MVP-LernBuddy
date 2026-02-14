@@ -105,3 +105,9 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
   - Display "Total Users" and "Total Sessions".
 - [ ] **Step 7.3: Feedback Review**
   - Display parent feedback logs in a clean dashboard view.
+
+## Phase 8: Scaling & Production (Future)
+
+- [ ] **Step 8.1: Transition to Paid API**
+  - Migrating from "Free Tier" to a Google Cloud Billing project to avoid "429 Quota Exceeded" errors.
+  - Estimated implementation: Soon/Tomorrow.
