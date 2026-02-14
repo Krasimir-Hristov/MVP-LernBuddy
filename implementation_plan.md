@@ -79,21 +79,21 @@ This plan breaks down the development of the "LernBuddy" Socratic AI Tutor MVP i
   - Add a clearly visible, pulsing "Heart" icon ❤️ in the header.
   - Implement a modal with a warm, personal message inviting parents to share ideas/feedback.
   - Log feedback entries to Supabase via the Analytics Proxy.
-- [ ] **Step 5.3: SEO & Metadata**
-  - Configure Next.js Metadata API for beautiful social sharing (titles, descriptions).
-  - Add Favicon and App Icons.
-- [ ] **Step 5.4: Mobile Polish & Optimization**
-  - Verify touch targets and button sizes for children's UI.
-  - Handle virtual keyboard focus/scroll behavior in the chat.
+- [x] **Step 5.3: SEO & Metadata**
+  - Configure Next.js Metadata API for beautiful social sharing (titles, descriptions). ✅
+  - Add Favicon and App Icons. (Paths configured, manual icons recommended). ✅
+- [x] **Step 5.4: Mobile Polish & Optimization**
+  - Verify touch targets and button sizes for children's UI. ✅
+  - Handle virtual keyboard focus/scroll behavior in the chat (h-[100dvh] & flex layout). ✅
 
 ## Phase 6: Final Review
 
-- [ ] **Step 6.1: Code Quality Check**
-  - Remove any `console.log` used for debugging.
-  - Ensure strict TypeScript compliance.
-- [ ] **Step 6.2: Security Verification**
-  - Confirm NO secret keys are leaked to client logic.
-  - Verify RLS policies on Supabase (if tables are accessed directly).
+- [x] **Step 6.1: Code Quality Check**
+  - Remove any `console.log` used for debugging. ✅
+  - Ensure strict TypeScript compliance. ✅
+- [x] **Step 6.2: Security Verification**
+  - Confirm NO secret keys are leaked to client logic. ✅
+  - Verify RLS policies on Supabase (if tables are accessed directly). ✅
 
 ## Phase 7: Admin Dashboard (Secure)
 

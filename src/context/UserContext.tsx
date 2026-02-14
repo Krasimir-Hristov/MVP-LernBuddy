@@ -96,8 +96,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           const errData = await response.json();
           console.error('Analytics Proxy Error:', errData);
-        } else {
-          console.log('User registered successfully via proxy');
         }
       } catch (err) {
         console.error('Failed to call analytics proxy:', err);

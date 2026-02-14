@@ -168,11 +168,10 @@ const ChatPage = () => {
   };
 
   return (
-    <div className='flex flex-col h-screen bg-background relative overflow-hidden font-sans text-foreground'>
+    <div className='flex flex-col h-[100dvh] bg-background relative overflow-hidden font-sans text-foreground selection:bg-primary/20'>
       {/* 1. Animated Background Blobs (Premium Style) */}
       <div className='absolute inset-0 w-full h-full overflow-hidden -z-10 pointer-events-none'>
-        <div className='absolute inset-0 bg-background/80 backdrop-blur-[1px]' />{' '}
-        {/* Subtle overlay */}
+        <div className='absolute inset-0 bg-background/80 backdrop-blur-[1px]' />
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
@@ -196,20 +195,22 @@ const ChatPage = () => {
         />
       </div>
 
-      {/* 2. Glassmorphism Header with Feedback Integrated */}
-      <header className='flex items-center justify-between px-6 py-4 z-30 sticky top-0 bg-background/40 backdrop-blur-xl border-b border-white/10 shadow-sm'>
-        <div className='flex items-center gap-4'>
+      {/* 2. Glassmorphism Header */}
+      <header className='flex items-center justify-between px-4 md:px-6 py-3 md:py-4 z-30 sticky top-0 bg-background/40 backdrop-blur-xl border-b border-white/10 shadow-sm flex-shrink-0'>
+        <div className='flex items-center gap-3 md:gap-4'>
           <Button
             variant='ghost'
             size='icon'
             onClick={() => router.push('/')}
-            className='rounded-full w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-muted-foreground'
+            className='rounded-full w-9 h-9 md:w-10 md:h-10 bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-muted-foreground'
           >
-            <ArrowLeft className='w-5 h-5' />
+            <ArrowLeft className='w-4 h-4 md:w-5 md:h-5' />
           </Button>
 
+          <img src='/logo.svg' alt='Logo' className='w-8 h-8 md:w-10 md:h-10' />
+
           <div className='flex flex-col'>
-            <h1 className='text-xl md:text-2xl font-bold tracking-tight'>
+            <h1 className='text-lg md:text-2xl font-bold tracking-tight'>
               <span className='text-foreground'>Lern</span>
               <span className='bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>
                 Buddy
@@ -220,16 +221,16 @@ const ChatPage = () => {
                 <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75'></span>
                 <span className='relative inline-flex rounded-full h-2 w-2 bg-green-500'></span>
               </span>
-              <p className='text-xs font-medium text-muted-foreground uppercase tracking-widest'>
+              <p className='text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-widest'>
                 {userData.subject}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Feedback Button - Integrated & Visible */}
+        {/* Feedback Button */}
         <div className='flex items-center gap-3'>
-          <div className='hidden md:flex flex-col items-end mr-2'>
+          <div className='hidden sm:flex flex-col items-end mr-2'>
             <span className='text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse'>
               Deine Meinung?
             </span>
@@ -239,8 +240,8 @@ const ChatPage = () => {
       </header>
 
       {/* 3. Messages Area */}
-      <ScrollArea className='flex-1 p-4 pb-0 overflow-y-auto z-10'>
-        <div className='max-w-3xl mx-auto space-y-8 pb-40 pt-6'>
+      <ScrollArea className='flex-1 p-4 pb-0 z-10'>
+        <div className='max-w-3xl mx-auto space-y-8 pb-10 pt-6'>
           <AnimatePresence initial={false} mode='popLayout'>
             {messages.map((m) => (
               <motion.div
@@ -278,7 +279,7 @@ const ChatPage = () => {
 
                 <div
                   className={`
-                    relative max-w-[90%] md:max-w-[80%] rounded-2xl p-5 shadow-sm overflow-hidden
+                    relative max-w-[90%] md:max-w-[80%] rounded-2xl p-4 md:p-5 shadow-sm overflow-hidden
                     ${
                       m.role === 'user'
                         ? 'bg-gradient-to-br from-primary to-blue-600 text-white rounded-tr-none shadow-primary/25'
@@ -286,12 +287,10 @@ const ChatPage = () => {
                     }
                   `}
                 >
-                  {/* Subtle noise texture/gradient overlay for distinct look */}
                   {m.role === 'user' && (
                     <div className='absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity pointer-events-none' />
                   )}
 
-                  {/* Render Images if present */}
                   {m.images && m.images.length > 0 && (
                     <div className='flex flex-wrap gap-2 mb-3'>
                       {m.images.map((img, idx) => (
@@ -301,13 +300,13 @@ const ChatPage = () => {
                           alt='Sent content'
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className='max-w-[150px] max-h-[150px] rounded-xl border-2 border-white/20 shadow-md hover:scale-105 transition-transform object-cover'
+                          className='max-w-[120px] md:max-w-[150px] max-h-[120px] md:max-h-[150px] rounded-xl border-2 border-white/20 shadow-md hover:scale-105 transition-transform object-cover'
                         />
                       ))}
                     </div>
                   )}
 
-                  <div className='prose prose-sm dark:prose-invert max-w-none leading-relaxed whitespace-pre-wrap selection:bg-white/30 text-base'>
+                  <div className='prose prose-sm dark:prose-invert max-w-none leading-relaxed whitespace-pre-wrap selection:bg-white/30 text-sm md:text-base'>
                     {m.content}
                   </div>
                 </div>
@@ -324,21 +323,14 @@ const ChatPage = () => {
                   <Sparkles className='w-4 h-4 text-white animate-pulse' />
                 </div>
                 <div className='bg-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl rounded-tl-none p-4 flex items-center gap-1.5'>
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className='w-2 h-2 bg-primary rounded-full'
-                  />
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                    className='w-2 h-2 bg-primary rounded-full'
-                  />
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                    className='w-2 h-2 bg-primary rounded-full'
-                  />
+                  {[0, 0.2, 0.4].map((delay) => (
+                    <motion.div
+                      key={delay}
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                      transition={{ repeat: Infinity, duration: 1, delay }}
+                      className='w-2 h-2 bg-primary rounded-full'
+                    />
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -347,9 +339,9 @@ const ChatPage = () => {
         </div>
       </ScrollArea>
 
-      {/* 4. Input Area (Floating Premium Style) */}
-      <div className='absolute bottom-0 left-0 w-full p-4 md:p-6 pb-6 bg-gradient-to-t from-background via-background/90 to-transparent z-20 pointer-events-none'>
-        <div className='max-w-3xl mx-auto relative group pointer-events-auto'>
+      {/* 4. Input Area (Fixed/Sticky for better mobile keyboard handle) */}
+      <div className='relative w-full p-4 md:p-6 bg-gradient-to-t from-background via-background/95 to-transparent z-20 flex-shrink-0 safe-area-inset-bottom'>
+        <div className='max-w-3xl mx-auto relative group'>
           {/* Images Preview - Floating above input */}
           <AnimatePresence>
             {images.length > 0 && (
@@ -357,20 +349,20 @@ const ChatPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className='absolute -top-32 left-0 w-full px-1 overflow-x-auto pb-4 flex gap-3'
+                className='absolute -top-32 left-0 w-full px-1 overflow-x-auto pb-4 flex gap-3 z-30'
               >
                 {images.map((img, index) => (
                   <div key={index} className='relative flex-shrink-0 group/img'>
                     <img
                       src={URL.createObjectURL(img)}
                       alt={`Preview ${index}`}
-                      className='w-24 h-24 object-cover rounded-2xl border-2 border-primary/30 shadow-xl bg-background/50 backdrop-blur-sm'
+                      className='w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl border-2 border-primary/30 shadow-xl bg-background/50 backdrop-blur-sm'
                     />
                     <button
                       onClick={() =>
                         setImages((prev) => prev.filter((_, i) => i !== index))
                       }
-                      className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1.5 shadow-lg scale-0 group-hover/img:scale-100 hover:bg-red-600 transition-all cursor-pointer'
+                      className='absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1.5 shadow-lg opacity-100 sm:scale-0 sm:group-hover/img:scale-100 hover:bg-red-600 transition-all cursor-pointer'
                     >
                       <X className='w-4 h-4' />
                     </button>
@@ -382,11 +374,9 @@ const ChatPage = () => {
 
           {/* Glass Input Bar */}
           <div className='relative'>
-            {/* Glow Effect on Focus */}
-            <div className='absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-[32px] blur opacity-20 group-focus-within:opacity-75 transition duration-500' />
+            <div className='absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-[32px] blur opacity-10 group-focus-within:opacity-50 transition duration-500' />
 
-            <div className='relative flex items-center gap-2 bg-background/60 border border-white/10 backdrop-blur-2xl rounded-[30px] p-2 shadow-2xl'>
-              {/* Camera Button */}
+            <div className='relative flex items-center gap-1 md:gap-2 bg-background/60 border border-white/10 backdrop-blur-2xl rounded-[30px] p-1.5 md:p-2 shadow-2xl'>
               <input
                 type='file'
                 accept='image/*'
@@ -401,18 +391,22 @@ const ChatPage = () => {
                 size='icon'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
-                className='rounded-full w-12 h-12 hover:bg-secondary/80 text-muted-foreground hover:text-primary transition-colors'
+                className='rounded-full w-10 h-10 md:w-12 md:h-12 hover:bg-secondary/80 text-muted-foreground hover:text-primary transition-colors'
               >
-                <Camera className='w-6 h-6' />
+                <Camera className='w-5 h-5 md:w-6 md:h-6' />
               </Button>
 
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={`Schreib ${userData.favoriteTeacher} etwas...`}
+                placeholder={
+                  window.innerWidth < 640
+                    ? 'Deine Frage...'
+                    : `Schreib ${userData.favoriteTeacher} etwas...`
+                }
                 disabled={isLoading}
-                className='flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-lg h-12 px-2 placeholder:text-muted-foreground/50'
+                className='flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base md:text-lg h-10 md:h-12 px-1 md:px-2 placeholder:text-muted-foreground/50'
               />
 
               <Button
@@ -420,11 +414,11 @@ const ChatPage = () => {
                 onClick={handleSend}
                 disabled={(!input.trim() && images.length === 0) || isLoading}
                 className={`
-                  rounded-full w-12 h-12 shadow-lg transition-all duration-300
+                  rounded-full w-10 h-10 md:w-12 md:h-12 shadow-lg transition-all duration-300
                   ${
                     !input.trim() && images.length === 0
                       ? 'bg-secondary text-muted-foreground opacity-50 cursor-not-allowed'
-                      : 'bg-primary text-primary-foreground hover:scale-105 hover:shadow-primary/30'
+                      : 'bg-primary text-primary-foreground hover:scale-105 active:scale-95'
                   }
                 `}
               >
@@ -433,8 +427,8 @@ const ChatPage = () => {
             </div>
           </div>
 
-          <p className='text-[10px] text-center mt-3 text-muted-foreground/40 font-medium tracking-widest uppercase'>
-            KI kann Fehler machen. Überprüfe wichtige Infos.
+          <p className='text-[10px] text-center mt-2.5 text-muted-foreground/40 font-medium tracking-widest uppercase'>
+            KI kann Fehler machen.
           </p>
         </div>
       </div>

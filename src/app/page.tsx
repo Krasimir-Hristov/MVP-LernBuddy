@@ -45,10 +45,14 @@ const LandingPage = () => {
         >
           <div className='flex justify-center mb-6'>
             <motion.div
-              whileHover={{ rotate: 15, scale: 1.1 }}
-              className='p-4 bg-primary/10 rounded-2xl border border-primary/20'
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className='relative'
             >
-              <GraduationCap className='w-12 h-12 text-primary' />
+              <img
+                src='/logo.svg'
+                alt='LernBuddy Logo'
+                className='w-24 h-24 md:w-32 md:h-32 drop-shadow-2xl'
+              />
             </motion.div>
           </div>
 
